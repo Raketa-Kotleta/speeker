@@ -1,7 +1,7 @@
 export default interface ISpaceElementMetadata {
     size: number,
     filesCount: number,
-    foldersCount: number,
+    directoriesCount: number,
     name: string,
     creationDate: string,
 }
