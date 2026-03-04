@@ -4,4 +4,5 @@ export default interface ISpaceElementMetadata {
     directoriesCount: number,
     name: string,
     creationDate: string,
+    type: 'directory' | 'file';
 }

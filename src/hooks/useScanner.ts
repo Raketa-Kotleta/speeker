@@ -17,10 +17,10 @@ export default function useScanner() {
                         handle.kind === 'file'
                             ? (await (handle as FileSystemFileHandle).getFile()).size
                             : 0,
+                    type: handle.kind,
                 },
                 [],
-                null,
-                handle.kind
+                null
             ),
             handle: handle,
         };
@@ -28,31 +28,48 @@ export default function useScanner() {
 
     async function scanDirectory(directory: FileSystemDirectoryHandle): Promise<SpaceElement> {
         const node = await createNode(directory);
-        const stack = [node];
         const root: SpaceElement = node.element;
-        const postProcessStack = [];
-        while (stack.length) {
-            const newElement = stack.pop()!;
-            postProcessStack.push(newElement.element);
 
-            for await (const entry of (newElement.handle as FileSystemDirectoryHandle).values()) {
-                const hanledEntry = await createNode(entry as FileSystemDirectoryHandle);
+        const stack = [node];
+        const postProcessStack: SpaceElement[] = [];
+
+        while (stack.length) {
+            const current = stack.pop()!;
+            postProcessStack.push(current.element);
+            for await (const [, entry] of (current.handle as FileSystemDirectoryHandle)) {
+                const handledEntry = await createNode(entry);
+
+                current.element.add(handledEntry.element);
+
                 if (entry.kind === 'directory') {
-                    stack.push(hanledEntry);
-                    newElement.element.add(hanledEntry.element);
-                    newElement.element.metadata.directoriesCount++;
-                } else {
-                    newElement.element.add(hanledEntry.element);
-                    newElement.element.metadata.filesCount++;
+                    stack.push(handledEntry);
                 }
             }
         }
 
         for (let i = postProcessStack.length - 1; i >= 0; i--) {
             const node = postProcessStack[i];
+
+            if (node.metadata.type === 'file') continue;
+
             node.metadata.size = node.children.reduce((sum, child) => sum + child.metadata.size, 0);
+
+            node.metadata.filesCount = node.children.reduce(
+                (sum, child) =>
+                    sum + (child.metadata.type === 'file' ? 1 : child.metadata.filesCount),
+                0
+            );
+
+            node.metadata.directoriesCount = node.children.reduce(
+                (sum, child) =>
+                    sum +
+                    (child.metadata.type === 'file' ? 0 : child.metadata.directoriesCount + 1),
+                0
+            );
         }
-        
+
+        console.log(root);
+
         return root;
     }
 

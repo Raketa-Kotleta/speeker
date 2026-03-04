@@ -12,7 +12,7 @@ const sizesClasses = {
 }
 export default function Button({children, className = '', size = 'md', ...rest} : IButtonProps) {
     
-    return <button className={`py-2 px-3 ${sizesClasses[size]} cursor-pointer border-gray-500 border-1 rounded-md ${className}`} {...rest}>
+    return <button className={`py-2 px-3 ${sizesClasses[size]} cursor-pointer border-zinc-500 border-1 rounded-md ${className}`} {...rest}>
         {children}
     </button>
 }

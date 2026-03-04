@@ -4,18 +4,15 @@ export default class SpaceElement {
     metadata: ISpaceElementMetadata;
     children: SpaceElement[];
     parent: SpaceElement | null;
-    type: 'directory' | 'file';
 
     constructor(
         metadata: ISpaceElementMetadata,
         children: SpaceElement[],
         parent: SpaceElement | null,
-        type: 'directory' | 'file'
     ) {
         this.metadata = metadata;
         this.children = children;
         this.parent = parent;
-        this.type = type;
     }
 
     add(element: SpaceElement) {
@@ -24,7 +21,7 @@ export default class SpaceElement {
     }
 
     clone(): SpaceElement {
-        return new SpaceElement({ ...this.metadata }, [], null, this.type);
+        return new SpaceElement({ ...this.metadata }, [], null);
     }
 
     deepClone(): SpaceElement {

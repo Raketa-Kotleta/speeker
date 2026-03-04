@@ -3,12 +3,10 @@ import SideSpaceViewer from './components/SideSpaceViewer';
 
 function App() {
     return (
-        <div id='app' data-theme="dark">
-            <div className='content flex flex-col h-full'>
-                <MainLayout>
-                    <SideSpaceViewer className='w-90 h-full'></SideSpaceViewer>
-                </MainLayout>
-            </div>
+        <div id='app' data-theme='dark'>
+            <MainLayout>
+                <SideSpaceViewer className='w-90 h-full overflow-y-auto overflow-x-clip shrink-0 hidden md:block'></SideSpaceViewer>
+            </MainLayout>
         </div>
     );
 }

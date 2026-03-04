@@ -4,7 +4,7 @@ import { formatSize } from '@/utils/format';
 import React from 'react';
 import type SpaceElement from '@/model/SpaceElement';
 
-export interface ISpaceElementViewerProps {
+export interface ISpaceElementViewerDefaultProps {
     children?: ReactNode;
     className?: string;
     element?: SpaceElement;
@@ -13,17 +13,14 @@ export interface ISpaceElementViewerProps {
     onClick?: MouseEventHandler;
 }
 
-export const SpaceElementViewer = React.memo(
+export const SpaceElementViewerDefault = React.memo(
     ({
         className = '',
         element,
-        markerColor = 'var(--color-blue-600)',
         onClick,
-    }: ISpaceElementViewerProps) => {
+    }: ISpaceElementViewerDefaultProps) => {
         if (!element) return;
         const { metadata } = element;
-        const widthPercent = Math.trunc(metadata.size / (element.parent?.metadata.size ?? 100) * 100);
-        const widthPercentStyle = widthPercent < 1 ? '1%' : `${widthPercent}%`;
         const icon =
             metadata.type === 'directory' ? (
                 <FolderIcon className='size-4 text-yellow-400'></FolderIcon>
@@ -41,12 +38,6 @@ export const SpaceElementViewer = React.memo(
                                 Size: {formatSize(metadata.size)}
                             </div>
                         </div>
-                    </div>
-                    <div className={`rounded-50 h-1 rounded-md w-12 bg-zinc-700`}>
-                        <div
-                            className={`h-full`}
-                            style={{ backgroundColor: markerColor, width: widthPercentStyle}}
-                        ></div>
                     </div>
                 </div>
             </div>
