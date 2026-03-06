@@ -9,6 +9,7 @@ export interface SunbrustNode {
 export interface SegmentElement {
     node: SunbrustNode;
     interval: [number, number];
+    id: string
 }
 
 export interface SegmentOptions {
@@ -17,6 +18,7 @@ export interface SegmentOptions {
 }
 
 export interface SegmentLayer {
+    id: string;
     elements: SegmentElement[];
     segmentOptions?: SegmentOptions;
     innerRadius: number;
@@ -62,6 +64,7 @@ export function SunbrustSegmentLayer({ layer }: SunbrustSegmentLayerProps) {
     const content: ReactNode = layer.elements.map(element => {
         return (
             <path
+                key={element.id}
                 d={makeArcPath(
                     element.interval[0],
                     element.interval[1],
