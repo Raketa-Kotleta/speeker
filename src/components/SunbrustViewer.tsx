@@ -7,13 +7,14 @@ import type { SunbrustNode } from '@/components/ui/sunbrust/SunbrustSegmentLayer
 export interface SunbrustViewerProps {
     className?: string;
 }
-const [zoomScale, minZoom, maxZoom] = [0.1, 1, 2];
+const [zoomScale, minZoom, maxZoom] = [0.1, 1, 2.5];
 
 function toSunburstNode(root: SpaceElement): SunbrustNode{
     const rootNode: SunbrustNode = {
         size: root.metadata.size,
         parent: null,
         children: [],
+        source: root 
     };
 
     const stack: Array<{ element: SpaceElement; node: SunbrustNode }> = [
@@ -28,6 +29,7 @@ function toSunburstNode(root: SpaceElement): SunbrustNode{
                 size: child.metadata.size,
                 parent: node,
                 children: [],
+                source: child
             };
             node.children.push(childNode);
             stack.push({ element: child, node: childNode });
@@ -40,6 +42,7 @@ function toSunburstNode(root: SpaceElement): SunbrustNode{
 export function SunbrustViewer({ className }: SunbrustViewerProps) {
     const [zoomValue, setZoomValue] = useState(1);
     const current = useMainStore(state => state.current);
+    const setCurrent = useMainStore(state => state.setCurrent);
 
     const zoom: WheelEventHandler = e => {
         if (e.deltaY < 0) {
@@ -63,7 +66,12 @@ export function SunbrustViewer({ className }: SunbrustViewerProps) {
                 options={{
                     rootRadius: graphRadius * zoomValue,
                     segmentWidth: graphSegmentWidth * zoomValue,
-                    maxLayers: 3
+                    maxLayers: 3,
+                    segmentOptions: {
+                        onClick(_e, node) {
+                            setCurrent(node.source as SpaceElement);
+                        },
+                    }
                 }}
             ></SunbrustGraphic>
         </div>

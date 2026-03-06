@@ -1,9 +1,10 @@
 import ColorUtils from '@/utils/colors';
-import { type MouseEventHandler, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 export interface SunbrustNode {
     parent: SunbrustNode | null;
     children: SunbrustNode[];
     size: number;
+    source: unknown;
 }
 
 export interface SegmentElement {
@@ -13,8 +14,8 @@ export interface SegmentElement {
 }
 
 export interface SegmentOptions {
-    onClick?: MouseEventHandler;
-    onHover?: MouseEventHandler;
+    onClick?: (e: React.MouseEvent<SVGPathElement, MouseEvent>, node: SunbrustNode) => void;
+    onHover?: (e: React.MouseEvent<SVGPathElement, MouseEvent>, node: SunbrustNode) => void ;
 }
 
 export interface SegmentLayer {
@@ -77,7 +78,7 @@ export function SunbrustSegmentLayer({ layer }: SunbrustSegmentLayerProps) {
                     element.node.parent?.children.length ?? 1
                 )}
                 fill-opacity='0.6'
-                onClick={layer.segmentOptions?.onClick}
+                onClick={(e) => layer.segmentOptions?.onClick?.(e, element.node)}
             />
         );
     });

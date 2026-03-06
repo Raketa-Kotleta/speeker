@@ -3,6 +3,7 @@ import {
     SunbrustSegmentLayer,
     type SegmentElement,
     type SegmentLayer,
+    type SegmentOptions,
     type SunbrustNode,
 } from './SunbrustSegmentLayer';
 
@@ -10,6 +11,7 @@ type GraphicOptions = {
     rootRadius: number;
     segmentWidth: number;
     maxLayers?: number;
+    segmentOptions?: SegmentOptions
 };
 
 export interface SunbrustGraphicProps {
@@ -20,7 +22,7 @@ export interface SunbrustGraphicProps {
 
 function buildLayers(
     root: SunbrustNode,
-    { rootRadius, segmentWidth, maxLayers = 4 }: GraphicOptions
+    { rootRadius, segmentWidth, maxLayers = 4, segmentOptions }: GraphicOptions
 ): SegmentLayer[] {
     const element: SegmentElement = {
         node: root,
@@ -48,45 +50,28 @@ function buildLayers(
             elements: [],
             innerRadius: currentLayer.innerRadius + segmentWidth + 2,
             segmentWidth: segmentWidth,
+            segmentOptions,
         };
-        for (const element of currentLayer.elements) {
+        for (const elementIndex in currentLayer.elements) {
+            const element = currentLayer.elements[elementIndex];
             const totalRange = element.interval[1] - element.interval[0];
             const children = element.node.children;
 
             if (!children.length) continue;
 
-            const raw = children.map(el => {
-                return (el.size / element.node.size) * totalRange
-            });
-
-            let stolen = 0;
-            const clamped = raw.map(interval => {
-                if (interval < 2) {
-                    stolen += 2 - interval;
-                    return 2;
-                }
-                return interval;
-            });
-
-            const bigTotal = raw.reduce((sum, v) => sum + (v >= 1 ? v : 0), 0);
-
-            const final = clamped.map((interval, i) => {
-                if (raw[i] >= 1 && bigTotal > 0) {
-                    return interval - stolen * (raw[i] / bigTotal);
-                }
-                return interval;
-            });
-
             let intervalShift = element.interval[0];
 
-            children.forEach((element, i) => {
+            children.forEach((node, i) => {
+                const interval = (node.size / element.node.size) * totalRange
+                if (interval < 0.5) return;
+
                 const childSegment: SegmentElement = {
-                    node: element,
-                    interval: [intervalShift, intervalShift + final[i]],
-                    id: `${layerNum}.${i}`
+                    node: node,
+                    interval: [intervalShift, intervalShift + interval],
+                    id: `${layerNum}.${elementIndex}.${i}`
                 };
                 layer.elements.push(childSegment);
-                intervalShift += final[i];
+                intervalShift += interval;
             });
         }
 
