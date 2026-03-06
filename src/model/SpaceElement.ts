@@ -24,9 +24,10 @@ export default class SpaceElement {
         return new SpaceElement({ ...this.metadata }, [], null);
     }
 
-    deepClone(): SpaceElement {
+    deepClone(parent: SpaceElement | null = null): SpaceElement {
         const copy = this.clone();
-        copy.children = this.children.map(c => c.deepClone());
+        copy.parent = parent
+        copy.children = this.children.map(c => c.deepClone(copy));
         return copy;
     }
 }

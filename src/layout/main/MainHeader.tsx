@@ -6,9 +6,10 @@ import { FolderIcon } from '@heroicons/react/16/solid';
 import { useCallback, type MouseEventHandler } from 'react';
 
 export default function MainHeader() {
-    const { selectFolder, scanDirectory } = useScanner();
+    const { scan } = useScanner();
     const currentElement = useMainStore(state => state.current);
     const setCurrent = useMainStore(state => state.setCurrent);
+    
     const getAllParents = useCallback(() => {
         const elements: SpaceElement[] = [];
         let current = currentElement?.parent;
@@ -23,7 +24,7 @@ export default function MainHeader() {
     const setRoot = useMainStore(state => state.setRoot);
 
     const onOpenFolderClick: MouseEventHandler = async () => {
-        const element = await scanDirectory(await selectFolder());
+        const element = await scan();
         setRoot(element);
     };
 

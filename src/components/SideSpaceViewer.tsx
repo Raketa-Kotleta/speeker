@@ -35,18 +35,19 @@ export default function SideSpaceViewer({ className = '' }: ISideSpaceViewerProp
                     onClick={() => setCurrent(element?.parent ?? element)}
                 ></SpaceElementViewerDefault>
             )}
-            {element?.children.map(child => (
-                <SpaceElementViewer
-                    element={child}
-                    key={child.metadata.name}
-                    className='hover:bg-zinc-800'
-                    onClick={() => setCurrent(child)}
-                    markerColor={ColorUtils.getColor(
-                        child.parent?.children.indexOf(child) ?? 1,
-                        child.parent?.children.length ?? 1
-                    )}
-                ></SpaceElementViewer>
-            ))}
+            {element?.children
+                .map(child => (
+                    <SpaceElementViewer
+                        element={child}
+                        key={child.metadata.name}
+                        className='hover:bg-zinc-800'
+                        onClick={() => setCurrent(child)}
+                        markerColor={ColorUtils.getColor(
+                            child.parent?.children.indexOf(child) ?? 1,
+                            child.parent?.children.length ?? 1
+                        )}
+                    ></SpaceElementViewer>
+                ))}
         </div>
     );
     return (
