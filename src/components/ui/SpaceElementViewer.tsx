@@ -38,7 +38,7 @@ export const SpaceElementViewer = React.memo(
                         <div>
                             <div className='text-white text-md break-all'>{metadata.name}</div>
                             <div className='mt-1 text-zinc-400 text-xs'>
-                                Size: {formatSize(metadata.size)}
+                                {formatSize(metadata.size)}
                             </div>
                         </div>
                     </div>

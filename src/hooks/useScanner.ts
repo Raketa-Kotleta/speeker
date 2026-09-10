@@ -1,10 +1,13 @@
 import SpaceElement from '@/model/SpaceElement';
+import { useMainStore } from '@/store/mainStore';
 
 type FileSystemHandleNode = {
     handle: FileSystemHandle;
     element: SpaceElement;
 };
+
 export default function useScanner() {
+    const showFiles = useMainStore(state => state.viewOptions.showFiles);
     const createNode = async (handle: FileSystemHandle): Promise<FileSystemHandleNode> => {
         return {
             element: new SpaceElement(
@@ -36,7 +39,8 @@ export default function useScanner() {
         while (stack.length) {
             const current = stack.pop()!;
             postProcessStack.push(current.element);
-            for await (const [, entry] of (current.handle as FileSystemDirectoryHandle)) {
+
+            for await (const [, entry] of current.handle as FileSystemDirectoryHandle) {
                 const handledEntry = await createNode(entry);
 
                 current.element.add(handledEntry.element);
@@ -68,18 +72,37 @@ export default function useScanner() {
             );
         }
 
-        console.log(root);
-
         return root;
     }
 
-    const selectFolder = async (): Promise<FileSystemDirectoryHandle> => {
+    const onlyDirectories = (element: SpaceElement) => {
+        const stack: SpaceElement[] = [element];
+
+        while (stack.length) {
+            const current = stack.pop()!;
+
+            const children: SpaceElement[] = [];
+            for (const child of current.children) {
+                if (child.metadata.type === 'file') continue;
+
+                children.push(child);
+                stack.push(child);
+            }
+
+            current.children = children;
+        }
+
+        return element;
+    };
+
+    const scan = async (): Promise<SpaceElement> => {
         const root = await window.showDirectoryPicker();
-        return root;
+        return showFiles ? await scanDirectory(root) : onlyDirectories(await scanDirectory(root));
     };
 
     return {
         scanDirectory,
-        selectFolder,
+        scan,
+        onlyDirectories
     };
 }
