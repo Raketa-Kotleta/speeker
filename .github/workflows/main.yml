@@ -1,35 +1,33 @@
-name: Build and Deploy Vite App
+name: Build
 
 on:
   push:
-    branches:
-      - main # Укажите имя вашей главной ветки (main или master)
-
-permissions:
-  contents: write # Даем экшену право записывать собранные файлы в ветку gh-pages
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: 'npm' # или 'yarn' / 'pnpm', если используете их
 
       - name: Install dependencies
         run: npm ci
 
       - name: Build project
-        run: npm run build # Vite скомпилирует проект в папку dist
+        run: npm run build
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
-          folder: dist # Для Vite всегда указывается папка dist
-          branch: gh-pages
+          name: dist
+          path: dist
